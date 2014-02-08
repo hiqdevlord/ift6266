@@ -1,5 +1,7 @@
-from pandas import DataFrame
+from pandas import DataFrame, Series
 import pandas as pd
+from rawFileParser import Parser
+import glob
 
 def get_prompts(file):
 
@@ -61,7 +63,7 @@ def get_speakers_info(file):
             continue
         
         line = line.split()
-        id = line[0]
+        id = line [1] + line[0]
         info = line[1:9]
         comment = " ".join(line[9:])
         info.append(comment)
@@ -104,6 +106,42 @@ def get_speakers_sentences(file):
 
     df = DataFrame(sentences, index=ids)
     return pd.concat({'SA':df.ix[:,0:1], 'SX':df.ix[:,1:7], 'SI':df.ix[:,7:10]}, axis=1)
+
+
+def get_phonemes_for_speaker(speaker):
+    """
+    Param
+        speaker: Series object containing the dialect region of the speaker and his id
+            e.g.
+                Sex                 M
+                DR                  6
+                Use               TRN
+                RecDate      03/03/86
+                BirthDate    06/17/60
+                Ht              5'11"
+                Race              WHT
+                Edu                BS
+                Comments             
+                Name: MABC0, dtype: object
+    Return
+        List of DataFrames containing the phonemes for each sentences the speaker recorded
+    """
+    if type(speaker) != Series:
+        raise Exception("The datastructure provided must be a Series")
+
+    speaker_id = speaker.name
+    dialect = speaker['DR']
+    path = "raw/TIMIT/TRAIN/DR{0}/{1}".format(dialect, speaker_id)
+    phonemes_path = glob.glob(path + '/*.PHN')
+
+    data = []
+    for p in phonemes_path:
+        parser = Parser(p)
+        data.append(parser.get_data())
+
+    return data
+
+
 
 
 
