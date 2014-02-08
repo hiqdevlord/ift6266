@@ -22,7 +22,8 @@ class Parser(object):
 
     def get_phonemes(self):
         df = pd.read_csv(self.path, sep=' ', header=None)
-        df.columns = pd.MultiIndex.from_tuples(zip([self.fileName]*3, ['start','end','phoneme']), names=['Prompt_id',''])
+        df.columns = (['start','end','phoneme'])
+        df.index = pd.MultiIndex.from_tuples(zip([self.fileName] * df.index.shape[0], df.index))
         return df
 
     def get_prompt(self):
@@ -44,5 +45,6 @@ class Parser(object):
 
     def get_words(self):
         df = pd.read_csv(self.path, sep=' ', header=None)
-        df.columns = pd.MultiIndex.from_tuples(zip([self.fileName]*3, ['start','end','word']), names=['Prompt_id',''])
+        df.columns = (['start','end','phoneme'])
+        df.index = pd.MultiIndex.from_tuples(zip([self.fileName] * df.index.shape[0], df.index))
         return df      
