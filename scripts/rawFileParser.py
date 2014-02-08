@@ -15,12 +15,14 @@ class Parser(object):
             return self.get_phonemes()
         elif self.fileExtension == '.TXT':
             return self.get_prompt()
+        elif self.fileExtension == '.WRD':
+            return self.get_words()
         else:
             raise Exception("Unsupported file format.")
 
     def get_phonemes(self):
         df = pd.read_csv(self.path, sep=' ', header=None)
-        df.columns = pd.MultiIndex.from_tuples(zip([self.fileName]*3, ['start','end','phoneme']))
+        df.columns = pd.MultiIndex.from_tuples(zip([self.fileName]*3, ['start','end','phoneme']), names=['Prompt_id',''])
         return df
 
     def get_prompt(self):
@@ -30,7 +32,6 @@ class Parser(object):
             print "\033[1,31mCould not open the file\033[0m"
             raise e
 
-        prompt
         line = fp.readlines()[0]
         line = line.strip('\n')
         line = line.split()
@@ -38,5 +39,10 @@ class Parser(object):
         end = line[1]
         prompt = " ".join(line[2:])
 
-        df = DataFrame((start, end, prompt), columns=['start','end','prompts'])
+        df = DataFrame([(start, end, prompt)], columns=['start','end','prompts'], index=[self.fileName])
         return df
+
+    def get_words(self):
+        df = pd.read_csv(self.path, sep=' ', header=None)
+        df.columns = pd.MultiIndex.from_tuples(zip([self.fileName]*3, ['start','end','word']), names=['Prompt_id',''])
+        return df      

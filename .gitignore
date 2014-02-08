@@ -38,3 +38,5 @@ nosetests.xml
 # TIMIT files
 raw/*
 readable/*
+TIMIT\ data\ exploration.ipynb
+.ipynb_checkpoints

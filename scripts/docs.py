@@ -108,7 +108,7 @@ def get_speakers_sentences(file):
     return pd.concat({'SA':df.ix[:,0:1], 'SX':df.ix[:,1:7], 'SI':df.ix[:,7:10]}, axis=1)
 
 
-def get_phonemes_for_speaker(speaker):
+def get_data_for_speaker(speaker, file_type):
     """
     Param
         speaker: Series object containing the dialect region of the speaker and his id
@@ -132,18 +132,24 @@ def get_phonemes_for_speaker(speaker):
     speaker_id = speaker.name
     dialect = speaker['DR']
     path = "raw/TIMIT/TRAIN/DR{0}/{1}".format(dialect, speaker_id)
-    phonemes_path = glob.glob(path + '/*.PHN')
+
+    if file_type == "PHN":
+        path += "/*.PHN"
+    elif file_type == "TXT":
+        path += "/*.TXT"
+    elif file_type == "WRD":
+        path += "/*.WRD"
+
+    file_paths = glob.glob(path)
 
     data = []
-    for p in phonemes_path:
-        parser = Parser(p)
+    for file_path in file_paths:
+        parser = Parser(file_path)
         data.append(parser.get_data())
 
-    return data
-
-
-
-
-
-
-
+    if file_type == "PHN":
+        return data
+    elif file_type == "TXT":
+        return pd.concat(data)
+    elif file_type == "WRD":
+        return data
