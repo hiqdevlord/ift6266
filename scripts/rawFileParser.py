@@ -8,7 +8,7 @@ class Parser(object):
     def __init__(self, path):
         self.path = path
         self.fileName, self.fileExtension = os.path.splitext(path)
-        self.fileName = self.fileName.split('/')[-1]
+        self.fileName = self.fileName.split('/')[-1].lower()
         
     def get_data(self):
         if self.fileExtension == '.PHN':

@@ -6,7 +6,7 @@ import glob
 def get_prompts(file):
 
     try:
-        fp = open(file)
+        fp = open(file='raw/TIMIT/DOC/PROMPTS.TXT')
     except Exception, e:
         print "\033[1,31mCould not open the file\033[0m"
         raise e
@@ -25,7 +25,7 @@ def get_prompts(file):
     return df
 
 
-def get_timit_dictionnary(file):
+def get_timit_dictionnary(file='raw/TIMIT/DOC/TIMITDIC.TXT'):
 
     try:
         fp = open(file)
@@ -48,8 +48,16 @@ def get_timit_dictionnary(file):
     return df
 
 
-def get_speakers_info(file):
-    
+def get_speakers_info(file='raw/TIMIT/DOC/SPKRINFO.TXT'):
+    """
+    From the speaker info file, the info of each speaker is parsed. 
+
+    Param
+        file: path to SPKRINFO.TXT. Default to raw/TIMIT/DOC/SPKRINFO.TXT
+
+    Return
+        DataFrame with the speaker id as the index and all their available info as columns
+    """   
     try:
         fp = open(file)
     except Exception, e:
@@ -74,7 +82,16 @@ def get_speakers_info(file):
     return df
 
 
-def get_speakers_sentences(file):
+def get_speakers_sentences(file='raw/TIMIT/DOC/SPKRSENT.TXT'):
+    """
+    From the speaker sentence file, the id of each sentence they spoke is parsed
+
+    Param
+        file: path to SPKRSENT.TXT. Default to raw/TIMIT/DOC/SPKRSENT.TXT
+
+    Return
+        DataFrame with the speaker id as the index and the id of the ten sentences they spoke as columns
+    """
     
     try:
         fp = open(file)
@@ -110,8 +127,11 @@ def get_speakers_sentences(file):
 
 def get_data_for_speaker(speaker, file_type):
     """
+    This method is mainly meant to be called after getting the speakers with get_speakers_info.
+    Parse each line of the resulting dataframe into this method to get whatever file type
+    you want.
     Param
-        speaker: Series object containing the dialect region of the speaker and his id
+        speaker: pandas Series object containing the dialect region of the speaker and his id
             e.g.
                 Sex                 M
                 DR                  6
@@ -125,6 +145,10 @@ def get_data_for_speaker(speaker, file_type):
                 Name: MABC0, dtype: object
     Return
         List of DataFrames containing the phonemes for each sentences the speaker recorded
+
+    TODO
+        Possibly support more format for speaker. It may be slow to iterate over a DataFrame
+        and use each row (that are Series) for this method.
     """
     if type(speaker) != Series:
         raise Exception("The datastructure provided must be a Series")
@@ -139,6 +163,8 @@ def get_data_for_speaker(speaker, file_type):
         path += "/*.TXT"
     elif file_type == "WRD":
         path += "/*.WRD"
+    else:
+        raise Exception("File format not supported.")
 
     file_paths = glob.glob(path)
 
