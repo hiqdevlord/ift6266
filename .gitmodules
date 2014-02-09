@@ -1,3 +1,6 @@
 [submodule "pylearn2"]
 	path = pylearn2
 	url = git://github.com/lisa-lab/pylearn2.git
+[submodule "jfsantos"]
+	path = jfsantos
+	url = https://github.com/jfsantos/ift6266h14.git
