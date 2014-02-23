@@ -1,0 +1,98 @@
+from pylearn2.datasets import DenseDesignMatrix
+from jfsantos.timit_full import TimitFullCorpusReader
+import numpy as np
+import itertools
+
+
+class TimitDataA(DenseDesignMatrix):
+    """
+    Dataset with frames and corresponding one-hot encoded
+    phones.
+    """
+    def __init__(self, datapath, framelen, overlap, start=0, stop=None):
+        """
+        datapath: path to TIMIT raw data (using WAV format)
+        framelen: length of the acoustic frames
+        overlap: amount of acoustic samples to overlap
+        start: index of first TIMIT file to be used
+        end: index of last TIMIT file to be used
+        """
+        data = TimitFullCorpusReader(datapath)
+        print datapath, framelen, overlap, start, stop
+        # Some list comprehension/zip magic here (but it works!)
+        if stop is None:
+            self.utterances = data.utteranceids()[start:]
+        else:
+            self.utterances = data.utteranceids()[start:stop]
+        self.spkrfr = [data.frames(z, framelen, overlap) for z in
+                  self.utterances]
+
+        self.fr, ph = zip(*[(x[0], x[1]) for x in self.spkrfr])
+
+
+
+        X = np.vstack(self.fr)*2**-15
+        self.ph = list(itertools.chain(*ph))
+        # making y a one-hot output
+        one_hot = np.zeros((len(self.ph),len(data.phonelist)),dtype='float32')
+        idx = [data.phonelist.index(p) for p in self.ph]
+        for i in xrange(len(self.ph)):
+            one_hot[i,idx[i]] = 1.
+        y = one_hot
+
+        y = np.array([X[:,-1]]).T
+        X = X[:,:-1]
+
+        super(TimitDataA,self).__init__(X=X, y=y)
+
+
+class TimitDataB(DenseDesignMatrix):
+    """
+    Dataset with frames and corresponding one-hot encoded
+    phones.
+    """
+    def __init__(self, datapath, framelen, overlap, start=0, stop=None):
+        """
+        datapath: path to TIMIT raw data (using WAV format)
+        framelen: length of the acoustic frames
+        overlap: amount of acoustic samples to overlap
+        start: index of first TIMIT file to be used
+        end: index of last TIMIT file to be used
+        """
+        data = TimitFullCorpusReader(datapath)
+        print datapath, framelen, overlap, start, stop
+        # Some list comprehension/zip magic here (but it works!)
+        if stop is None:
+            self.utterances = data.utteranceids()[start:]
+        else:
+            self.utterances = data.utteranceids()[start:stop]
+        self.spkrfr = [data.frames(z, framelen, overlap) for z in
+                  self.utterances]
+
+        self.fr, ph = zip(*[(x[0], x[1]) for x in self.spkrfr])
+
+
+
+        X = np.vstack(self.fr)*2**-15
+        self.ph = list(itertools.chain(*ph))
+        # making y a one-hot output
+        one_hot = np.zeros((len(self.ph),len(data.phonelist)),dtype='float32')
+        idx = [data.phonelist.index(p) for p in self.ph]
+        for i in xrange(len(self.ph)):
+            one_hot[i,idx[i]] = 1.
+        y = one_hot
+
+        train_y = X[:,-1]
+        temp_X = []
+        for i, r in enumerate(X):
+            temp_X.append(np.append(r[:-1], (y[i])))
+
+        y = np.array([train_y]).T
+        X = np.array(temp_X)
+        super(TimitDataB,self).__init__(X=X, y=y)
+
+
+
+
+
+
