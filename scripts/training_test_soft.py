@@ -20,16 +20,16 @@ from pylearn2.termination_criteria import MonitorBased
 train = """!obj:pylearn2.train.Train {
     dataset: &train !obj:jfsantos.timit_dataset.TimitPhoneData {
         datapath: '/Users/alexis/university/ift6266/data/timit/raw/TIMIT',
-        framelen: 1000,
-        overlap: 800,
+        framelen: &flen 240,
+        overlap: &ol 239,
         start: 0,
-        stop: 2000
+        stop: &stopTrain 2000
     },
     model: !obj:pylearn2.models.mlp.MLP {
         layers: [
                  !obj:pylearn2.models.mlp.Sigmoid {
                      layer_name: 'h0',
-                     dim: 800,
+                     dim: 1100,
                      sparse_init: 15,
                  }, !obj:pylearn2.models.mlp.Softmax {
                      layer_name: 'y',
@@ -49,21 +49,21 @@ train = """!obj:pylearn2.train.Train {
                 'train' : *train,
                 'valid' : !obj:jfsantos.timit_dataset.TimitPhoneData {
                               datapath: '/Users/alexis/university/ift6266/data/timit/raw/TIMIT',
-                              framelen: 1000,
-                              overlap: 800,
-                              start: 2000,
-                              stop: 3000
+                              framelen: *flen,
+                              overlap: *ol,
+                              start: *stopTrain,
+                              stop: &stopValid 3000
                           },
                 'test'  : !obj:jfsantos.timit_dataset.TimitPhoneData {
                               datapath: '/Users/alexis/university/ift6266/data/timit/raw/TIMIT',
-                              framelen: 1000,
-                              overlap: 800,
-                              start: 3000,
+                              framelen: *flen,
+                              overlap: *ol,
+                              start: *stopValid,
                               stop: 4000
                           }
             },
         termination_criterion: !obj:pylearn2.termination_criteria.MonitorBased {
-            channel_name: "valid_y_misclass"
+          channel_name: 'valid_y_misclass'
         }
     },
     extensions: [

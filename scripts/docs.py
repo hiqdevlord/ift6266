@@ -3,10 +3,10 @@ import pandas as pd
 from rawFileParser import Parser
 import glob
 
-def get_prompts(file):
+def get_prompts(file='raw/TIMIT/DOC/PROMPTS.TXT'):
 
     try:
-        fp = open(file='raw/TIMIT/DOC/PROMPTS.TXT')
+        fp = open(file)
     except Exception, e:
         print "\033[1,31mCould not open the file\033[0m"
         raise e
@@ -155,7 +155,7 @@ def get_data_for_speaker(speaker, file_type):
 
     speaker_id = speaker.name
     dialect = speaker['DR']
-    path = "raw/TIMIT/TRAIN/DR{0}/{1}".format(dialect, speaker_id)
+    path = "/Users/alexis/university/ift6266/data/timit/raw/TIMIT/TRAIN/DR{0}/{1}".format(dialect, speaker_id)
 
     if file_type == "PHN":
         path += "/*.PHN"
