@@ -2,11 +2,12 @@ from pandas import DataFrame, Series
 import pandas as pd
 from rawFileParser import Parser
 import glob
+import os
 
 def get_prompts(file='raw/TIMIT/DOC/PROMPTS.TXT'):
-
+    path = os.path.join(file, 'TIMIT/DOC/PROMPTS.TXT')
     try:
-        fp = open(file)
+        fp = open(path)
     except Exception, e:
         print "\033[1,31mCould not open the file\033[0m"
         raise e
@@ -25,10 +26,10 @@ def get_prompts(file='raw/TIMIT/DOC/PROMPTS.TXT'):
     return df
 
 
-def get_timit_dictionnary(file='raw/TIMIT/DOC/TIMITDIC.TXT'):
-
+def get_timit_dictionnary(file):
+    path = os.path.join(file, 'TIMIT/DOC/TIMITDIC.TXT')
     try:
-        fp = open(file)
+        fp = open(path)
     except Exception, e:
         print "\033[1,31mCould not open the file\033[0m"
         raise e
@@ -48,7 +49,7 @@ def get_timit_dictionnary(file='raw/TIMIT/DOC/TIMITDIC.TXT'):
     return df
 
 
-def get_speakers_info(file='raw/TIMIT/DOC/SPKRINFO.TXT'):
+def get_speakers_info(file):
     """
     From the speaker info file, the info of each speaker is parsed. 
 
@@ -58,8 +59,9 @@ def get_speakers_info(file='raw/TIMIT/DOC/SPKRINFO.TXT'):
     Return
         DataFrame with the speaker id as the index and all their available info as columns
     """   
+    path = os.path.join(file, 'TIMIT/DOC/SPKRINFO.TXT')
     try:
-        fp = open(file)
+        fp = open(path)
     except Exception, e:
         print "\033[1,31mCould not open the file\033[0m"
         raise e
@@ -72,17 +74,17 @@ def get_speakers_info(file='raw/TIMIT/DOC/SPKRINFO.TXT'):
         
         line = line.split()
         id = line [1] + line[0]
-        info = line[1:9]
+        info = line[0:9]
         comment = " ".join(line[9:])
         info.append(comment)
         ids.append(id)
         infos.append(info)
 
-    df = DataFrame(infos, index=ids, columns=['Sex', 'DR', 'Use',  'RecDate',   'BirthDate',  'Ht',    'Race', 'Edu',  'Comments'])
+    df = DataFrame(infos, index=ids, columns=['id', 'Sex', 'DR', 'Use',  'RecDate',   'BirthDate',  'Ht',    'Race', 'Edu',  'Comments'])
     return df
 
 
-def get_speakers_sentences(file='raw/TIMIT/DOC/SPKRSENT.TXT'):
+def get_speakers_sentences(file):
     """
     From the speaker sentence file, the id of each sentence they spoke is parsed
 
@@ -92,9 +94,9 @@ def get_speakers_sentences(file='raw/TIMIT/DOC/SPKRSENT.TXT'):
     Return
         DataFrame with the speaker id as the index and the id of the ten sentences they spoke as columns
     """
-    
+    path = os.path.join(file, 'TIMIT/DOC/SPKRSENT.TXT')
     try:
-        fp = open(file)
+        fp = open(path)
     except Exception, e:
         print "\033[1,31mCould not open the file\033[0m"
         raise e

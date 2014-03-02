@@ -23,13 +23,13 @@ train = """!obj:pylearn2.train.Train {
         framelen: &flen 240,
         overlap: &ol 239,
         start: 0,
-        stop: &stopTrain 2000
+        stop: &stopTrain 500
     },
     model: !obj:pylearn2.models.mlp.MLP {
         layers: [
                  !obj:pylearn2.models.mlp.Sigmoid {
                      layer_name: 'h0',
-                     dim: 1100,
+                     dim: 300,
                      sparse_init: 15,
                  }, !obj:pylearn2.models.mlp.Softmax {
                      layer_name: 'y',
@@ -52,14 +52,14 @@ train = """!obj:pylearn2.train.Train {
                               framelen: *flen,
                               overlap: *ol,
                               start: *stopTrain,
-                              stop: &stopValid 3000
+                              stop: &stopValid 600
                           },
                 'test'  : !obj:jfsantos.timit_dataset.TimitPhoneData {
                               datapath: '/Users/alexis/university/ift6266/data/timit/raw/TIMIT',
                               framelen: *flen,
                               overlap: *ol,
                               start: *stopValid,
-                              stop: 4000
+                              stop: 700
                           }
             },
         termination_criterion: !obj:pylearn2.termination_criteria.MonitorBased {

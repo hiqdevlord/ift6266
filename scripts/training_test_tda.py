@@ -2,6 +2,7 @@ import glob
 import pandas as pd
 from pandas import DataFrame
 import numpy as np
+import docs
 import os
 from scipy.io import wavfile
 import subprocess
@@ -34,7 +35,7 @@ train = """!obj:pylearn2.train.Train {
                  }, !obj:pylearn2.models.mlp.Linear {
                      layer_name: 'y',
                      dim: 1,
-                     irange: 0.
+                     irange: 10.
                  }
                 ],
         nvis: 999,
@@ -69,10 +70,11 @@ train = """!obj:pylearn2.train.Train {
     extensions: [
         !obj:pylearn2.train_extensions.best_params.MonitorBasedSaveBest {
              channel_name: 'valid_y_range_x_mean_u',
-             save_path: "mlp_best_tda_1000Frames.pkl"
+             save_path: "results/mlp_best_tda_1000Frames.pkl"
         },
     ]
 }"""
+
 
 train = yaml_parse.load(train)
 train.main_loop()
