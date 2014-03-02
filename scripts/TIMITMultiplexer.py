@@ -5,6 +5,9 @@ from pandas import DataFrame, MultiIndex
 import glob
 from scipy.io import wavfile
 import numpy as np
+from datetime import datetime
+import time
+import re
 
 class TIMITMultiplexer(object):
     """docstring for TIMITMultiplexer"""
@@ -38,17 +41,16 @@ class TIMITMultiplexer(object):
         if dialect:
             self.one_hot('DR')
         if recdate:
-            self.attach_recdate()
+            self.date_to_timestamp('RecDate')
         if birthdate:
-            self.attach_birthdate()
+            self.date_to_timestamp('BirthDate')
         if height:
             self.attach_height()
         if race:
             self.one_hot('Race')
         if edu:
             self.one_hot('Edu')
-        if phoneme:
-            self.attach_phoneme()
+
 
 
     def get_acoustic(self):
@@ -74,20 +76,37 @@ class TIMITMultiplexer(object):
 
 
 
-    def attach_recdate(self):
-        pass
+    def date_to_timestamp(self, key):
+        format = "%m/%d/%y"
+        values = []
 
+        for spkr_aug_id in self.spkrs_augmented_id:
+            spkr = self.df.ix[spkr_aug_id]
+            num_sent = spkr.shape[0]
 
-    def attach_birthdate(self):
-        pass
+            dt = self.spkrs_info.ix[spkr_aug_id][key]
+
+            recDate = time.mktime(datetime.strptime(dt,format).timetuple())
+            values.extend([recDate] * num_sent)
+
+        self.df[key] = values
 
 
     def attach_height(self):
-        pass
+        values = []
+
+        for spkr_aug_id in self.spkrs_augmented_id:
+            spkr = self.df.ix[spkr_aug_id]
+            num_sent = spkr.shape[0]
+
+            ht = self.spkrs_info.ix[spkr_aug_id]['Ht']
+            m = re.split('[\'\"]', ht)
+            inches = int(m[0]) * 12 + int(m[1])
+            values.extend([inches] * num_sent)
+
+        self.df['Ht'] = values
 
 
-    def attach_phoneme(self):
-        pass
 
     def one_hot(self, key):
         unique_values = list(self.spkrs_info[key].unique())
