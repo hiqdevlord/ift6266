@@ -2,6 +2,81 @@ from pylearn2.datasets import DenseDesignMatrix
 from jfsantos.timit_full import TimitFullCorpusReader
 import numpy as np
 import itertools
+import os
+import numpy as np
+from TIMITMultiplexer import TIMITMultiplexer
+
+
+class FrameData(DenseDesignMatrix):
+    
+    def __init__(self, framelen=0, overlap=0, start=0, stop=None, sex=False, dialect=False, race=False, edu=False, recdate=False, height=False):
+        t_mult = TIMITMultiplexer('/Users/alexis/university/ift6266/data/timit/raw', sex=sex, dialect=dialect, race=race, edu=edu, recdate=recdate, height=height)
+
+        samples = []
+        for index in t_mult.df.index:
+            s = t_mult.df.ix[index]
+            acoustic = s['acoustic']
+            if s.shape[0] > 1:
+                rest = np.concatenate(s[1:].values)
+            else:
+                rest = np.array([])
+
+            begin = 0
+            jump = framelen - overlap
+            for end in range(framelen, len(acoustic), jump):
+                concat = np.concatenate((rest, acoustic[begin:end]))
+                samples.append(concat)
+                begin += jump
+
+        samples = np.array(samples)
+
+        if stop is None:
+            X = samples[start:,:-1]
+            y = samples[start:,-1]
+        else:
+            X = samples[start:stop,:-1]
+            y = samples[start:stop,-1]
+
+        y = y.reshape(y.shape[0], 1)
+
+        super(FrameData,self).__init__(X=X, y=y)
+
+
+class FrameDataB(DenseDesignMatrix):
+    
+    def __init__(self, framelen=0, overlap=0, start=0, stop=None):
+        filename = "FrameData_{}_{}.npy".format(framelen, overlap)
+        filepath = os.path.join('saved_dataset', filename)
+        if os.path.exists(filename):
+            samples = np.load(filename)
+        else:
+            t_mult = TIMITMultiplexer('/Users/alexis/university/ift6266/data/timit/raw')
+
+            samples = []
+            for index in t_mult.df.index:
+                s = t_mult.df.ix[index]
+                acoustic = s['acoustic']
+                rest = np.concatenate(s[1:].values)
+                
+                start = 0
+                jump = framelen - overlap
+                for end in range(framelen, len(acoustic), jump):
+                    samples.append(np.concatenate((rest, acoustic[start:end])))
+                    start += jump
+
+            samples = np.array(samples)
+            np.save(open(filename,'wb'), samples)
+
+        if stop is None:
+            X = samples[start:,:-1]
+            y = samples[start:,-1]
+        else:
+            X = samples[start:stop,:-1]
+            y = samples[start:stop,-1]
+        
+        y = y.reshape(y.shape[0], 1)
+        super(FrameData,self).__init__(X=X, y=y)
+
 
 
 class TimitDataA(DenseDesignMatrix):

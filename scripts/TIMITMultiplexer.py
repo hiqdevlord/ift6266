@@ -9,15 +9,15 @@ from datetime import datetime
 import time
 import re
 
+
 class TIMITMultiplexer(object):
-    """docstring for TIMITMultiplexer"""
-    def __init__(self, raw_path, frame_len=0, overlap=0, sex=False, dialect=False, 
-        recdate=False, birthdate=False, height=False, race=False, edu=False, phoneme=False):
+    """TIMITMultiplexer is a base class that is the foundation of further preprocessing. Inherit this class
+    and modify self.df to your liking.
+    """
+    def __init__(self, raw_path, sex=False, dialect=False, 
+        recdate=False, birthdate=False, height=False, race=False, edu=False):
         
-        super(TIMITMultiplexer, self).__init__()
         self.raw_path = raw_path
-        self.frame_len = frame_len
-        self.overlap = overlap
         self.sex = sex
         self.dialect = dialect
         self.recdate = recdate
@@ -25,7 +25,6 @@ class TIMITMultiplexer(object):
         self.height = height
         self.race = race
         self.edu = edu
-        self.phoneme = phoneme
         
 
         self.spkrs_info = docs.get_speakers_info(self.raw_path)
@@ -51,7 +50,7 @@ class TIMITMultiplexer(object):
         if edu:
             self.one_hot('Edu')
 
-
+        super(TIMITMultiplexer, self).__init__()
 
     def get_acoustic(self):
         acoustic = []
@@ -102,10 +101,10 @@ class TIMITMultiplexer(object):
             ht = self.spkrs_info.ix[spkr_aug_id]['Ht']
             m = re.split('[\'\"]', ht)
             inches = int(m[0]) * 12 + int(m[1])
-            values.extend([inches] * num_sent)
+            for num in range(num_sent):
+                values.append([inches])
 
         self.df['Ht'] = values
-
 
 
     def one_hot(self, key):
